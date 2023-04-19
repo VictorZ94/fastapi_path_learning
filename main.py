@@ -63,3 +63,15 @@ def get_movies_by_category(category: str, year: int): #Usando parametros query
   return [movie for movie in movies if movie['category'].lower() == category.lower()]
   #Another solution is:
   #return list(filter(lambda item: item['category'] == category , movies))
+
+@app.post('/movies', tags=["Create new movies"])
+def create_movies(id: int = Body(), title: str = Body(), year: int = Body(), rating: float | int = Body(), category: str = Body()):
+  movie = {
+    "id": id,
+    "title": title,
+    "year": year,
+    "rating": rating,
+    "category": category
+  }
+  movies.append(movie)
+  return movie
