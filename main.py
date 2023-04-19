@@ -75,3 +75,20 @@ def create_movies(id: int = Body(), title: str = Body(), year: int = Body(), rat
   }
   movies.append(movie)
   return movie
+
+@app.put('/movies', tags=["Update a movie"])
+def update_movies(
+  id: int = Body(),
+  title: str = Body(),
+  year: int = Body(),
+  rating: float | int = Body(),
+  category: str = Body()
+):
+  for item in movies:
+    if item["id"] == id:
+      item["title"] = title
+      item["year"] = year
+      item["rating"] = rating
+      item["category"] = category
+      return item
+  return "There's no item to update"
