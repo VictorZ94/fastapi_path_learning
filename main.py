@@ -92,3 +92,11 @@ def update_movies(
       item["category"] = category
       return item
   return "There's no item to update"
+
+@app.delete('/movies', tags=["Delete a movie"])
+def delete_movies(id: int):
+  for item in movies:
+    if item["id"] == id:
+      movies.remove(item)
+      return "Item deleted"
+  return "There's no item to delete"
