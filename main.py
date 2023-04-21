@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Path, Query
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from model import Movie
+from typing import List
 
 app = FastAPI()
 app.title = "My first api with FastAPI"
@@ -44,45 +45,45 @@ movies = [
     }
   ]
 
-
 @app.get('/', tags=["Home"])
 def message():
   return HTMLResponse('<h1>Hello World! changed</h1>')
 
-@app.get('/movies', tags=["movies"])
-def get_movies():
-  return movies
+@app.get('/movies', tags=["movies"], response_model=List[Movie])
+def get_movies() -> List[Movie]:
+  return JSONResponse(content=movies)
 
-@app.get('/movies/{id}', tags=["movies"])
-def get_movies(id: int = Path(ge=1, le=2000)):
+@app.get('/movies/{id}', tags=["movies"], response_model=Movie)
+def get_movies(id: int = Path(ge=1, le=2000)) -> Movie:
   for item in movies:
     if item["id"] == id:
-      return item
-  return "There's no items to show"
+      return JSONResponse(content=item)
+  return JSONResponse(content=[])
 
-@app.get('/movies/', tags=["movies"])
-def get_movies_by_category(category: str = Query(min_length=5, max_length=15)): #Usando parametros query
-  return [movie for movie in movies if movie['category'].lower() == category.lower()]
+@app.get('/movies/', tags=["movies"], response_model=List[Movie])
+def get_movies_by_category(category: str = Query(min_length=5, max_length=15)) -> List[Movie]: #Usando parametros query
+  data = [ movie for movie in movies if movie['category'].lower() == category.lower() ]
+  return JSONResponse(content=data)
   #Another solution is:
   #return list(filter(lambda item: item['category'] == category , movies))
 
-@app.post('/movies', tags=["Create new movies"])
-def create_movies(movie: Movie):
+@app.post('/movies', tags=["Create new movies"], response_model=dict)
+def create_movies(movie: Movie) -> dict:
   movies.append(movie.dict())
-  return movie
+  return JSONResponse(content={"message": "Movie created successfully"})
 
-@app.put('/movies', tags=["Update a movie"])
-def update_movies(id: int, movie: Movie):
+@app.put('/movies', tags=["Update a movie"], response_model=dict)
+def update_movies(id: int, movie: Movie) -> dict:
   for mov in movies:
     if mov["id"] == id:
       mov.update(movie)
-      return mov
-  return "There's no item to update"
+      return JSONResponse(content={"message": "Movie modified successfully"})
+  return "There's no movie to update"
 
-@app.delete('/movies', tags=["Delete a movie"])
-def delete_movies(id: int):
+@app.delete('/movies', tags=["Delete a movie"], response_model=dict)
+def delete_movies(id: int) -> dict:
   for item in movies:
     if item["id"] == id:
       movies.remove(item)
-      return "Item deleted"
+      return JSONResponse(content={"message": "Movie deleted successfully"})
   return "There's no item to delete"
