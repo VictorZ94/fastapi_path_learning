@@ -1,5 +1,7 @@
 from fastapi import FastAPI, Body
 from fastapi.responses import HTMLResponse
+from pydantic import BaseModel
+from typing import Optional
 
 app = FastAPI()
 app.title = "My first api with FastAPI"
@@ -43,6 +45,15 @@ movies = [
     }
   ]
 
+class Movie(BaseModel):
+  id: Optional[int] = None
+  #Other way to do this
+  #id: int | None = None
+  title: str
+  year: int
+  rating: float | int
+  category: str
+
 @app.get('/', tags=["Home"])
 def message():
   return HTMLResponse('<h1>Hello World! changed</h1>')
@@ -65,32 +76,16 @@ def get_movies_by_category(category: str, year: int): #Usando parametros query
   #return list(filter(lambda item: item['category'] == category , movies))
 
 @app.post('/movies', tags=["Create new movies"])
-def create_movies(id: int = Body(), title: str = Body(), year: int = Body(), rating: float | int = Body(), category: str = Body()):
-  movie = {
-    "id": id,
-    "title": title,
-    "year": year,
-    "rating": rating,
-    "category": category
-  }
-  movies.append(movie)
+def create_movies(movie: Movie):
+  movies.append(movie.dict())
   return movie
 
 @app.put('/movies', tags=["Update a movie"])
-def update_movies(
-  id: int = Body(),
-  title: str = Body(),
-  year: int = Body(),
-  rating: float | int = Body(),
-  category: str = Body()
-):
-  for item in movies:
-    if item["id"] == id:
-      item["title"] = title
-      item["year"] = year
-      item["rating"] = rating
-      item["category"] = category
-      return item
+def update_movies(id: int, movie: Movie):
+  for mov in movies:
+    if mov["id"] == id:
+      mov.update(movie)
+      return mov
   return "There's no item to update"
 
 @app.delete('/movies', tags=["Delete a movie"])
