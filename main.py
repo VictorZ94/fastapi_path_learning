@@ -15,7 +15,10 @@ def message():
 
 @app.post("/login", tags=["Auth"])
 def login(user: User):
-  return user
+  if user.email == "admin" and user.password == "admin":
+    token: str = create_token(user.dict())
+    return JSONResponse(content=token)
+  return JSONResponse({"message": "Invalid user or no authenticated"})
 
 @app.get('/movies', tags=["movies"], response_model=List[Movie], status_code=200)
 def get_movies() -> List[Movie]:
