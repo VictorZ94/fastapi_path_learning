@@ -2,6 +2,10 @@ from pydantic import BaseModel, Field
 from typing import Optional
 import datetime
 
+class User(BaseModel):
+  email: str
+  password: str
+
 class Movie(BaseModel):
   """
     gt: greater than

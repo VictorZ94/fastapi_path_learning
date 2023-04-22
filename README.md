@@ -6,3 +6,6 @@
 
 ## Changing Port
 - uvicorn main:app --port 5000 --reload
+
+## working with auth install next package.
+- pip install pyjwt

@@ -1,8 +1,9 @@
 from fastapi import FastAPI, Path, Query
 from fastapi.responses import HTMLResponse, JSONResponse
-from model import Movie
+from model import Movie, User
 from typing import List
 from data import movies
+from jwt_manager import create_token
 
 app = FastAPI()
 app.title = "My first api with FastAPI"
@@ -11,6 +12,10 @@ app.version = "0.0.1"
 @app.get('/', tags=["Home"])
 def message():
   return HTMLResponse('<h1>Hello World! changed</h1>')
+
+@app.post("/login", tags=["Auth"])
+def login(user: User):
+  return user
 
 @app.get('/movies', tags=["movies"], response_model=List[Movie], status_code=200)
 def get_movies() -> List[Movie]:
